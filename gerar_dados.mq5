@@ -1,0 +1,125 @@
+datetime ultimo_candle = 0; 
+ 
+void OnTick() 
+{ 
+   datetime candle_atual = iTime(_Symbol, PERIOD_H2, 0); 
+ 
+   if(candle_atual != ultimo_candle) 
+   { 
+      ultimo_candle = candle_atual; 
+ 
+      Print("Novo candle detectado!"); 
+ 
+      AtualizarDados(); 
+   } 
+} 
+ 
+void AtualizarDados() 
+{ 
+   int arquivo = FileOpen("dados_gerados.csv", FILE_WRITE | FILE_CSV | FILE_UNICODE); 
+ 
+   if(arquivo == INVALID_HANDLE) 
+   { 
+      Print("Erro ao abrir arquivo"); 
+      return; 
+   } 
+ 
+   FileWrite(arquivo,
+      "time",
+      "oh2", "hh2", "lh2", "ch2",
+      "od1", "hd1", "cd1", "ld1",
+      "oh4", "hh4", "ch4", "lh4", 
+      "oh6", "hh6", "ch6", "lh6",
+      "oh8", "hh8", "ch8", "lh8",
+      "oh12", "hh12", "ch12", "lh12",
+      "oh1", "hh1", "ch1", "lh1",
+      "ow1", "hw1", "cw1", "lw1",
+      "omn", "hmn", "cmn", "lmn",
+      "om30", "hm30", "cm30", "lm30", "volume"
+   ); 
+   
+   int total = Bars(_Symbol, PERIOD_H2); 
+ 
+   for(int i = total - 1; i >= 1; i--) 
+   { 
+      datetime tempo = iTime(_Symbol, PERIOD_H2, i); 
+      
+      double oh2 = iOpen(_Symbol, PERIOD_H2, i); 
+      double hh2 = iHigh(_Symbol, PERIOD_H2, i); 
+      double lh2 = iLow(_Symbol, PERIOD_H2, i); 
+      double ch2 = iClose(_Symbol, PERIOD_H2, i); 
+       
+      int indiceD1 = iBarShift(_Symbol, PERIOD_D1, tempo);
+      double od1 = iOpen(_Symbol, PERIOD_D1, indiceD1); 
+      double hd1 = iHigh(_Symbol, PERIOD_D1, indiceD1); 
+      double ld1 = iLow(_Symbol, PERIOD_D1, indiceD1); 
+      double cd1 = iClose(_Symbol, PERIOD_D1, indiceD1); 
+     
+      int indiceH4 = iBarShift(_Symbol, PERIOD_H4, tempo);
+      double oh4 = iOpen(_Symbol,PERIOD_H4, indiceH4);
+      double hh4 = iHigh(_Symbol, PERIOD_H4, indiceH4);
+      double lh4 = iLow(_Symbol, PERIOD_H4, indiceH4);
+      double ch4 = iClose(_Symbol, PERIOD_H4, indiceH4);
+      
+      int indiceH6 = iBarShift(_Symbol, PERIOD_H6, tempo);
+      double oh6 = iOpen(_Symbol,PERIOD_H6, indiceH6);
+      double hh6 = iHigh(_Symbol, PERIOD_H6, indiceH6);
+      double lh6 = iLow(_Symbol, PERIOD_H6, indiceH6);
+      double ch6 = iClose(_Symbol, PERIOD_H6, indiceH6);
+      
+      int indiceH8 = iBarShift(_Symbol, PERIOD_H8, tempo);
+      double oh8 = iOpen(_Symbol,PERIOD_H8, indiceH8);
+      double hh8 = iHigh(_Symbol, PERIOD_H8, indiceH8);
+      double lh8 = iLow(_Symbol, PERIOD_H8, indiceH8);
+      double ch8 = iClose(_Symbol, PERIOD_H8, indiceH8);
+      
+      int indiceH12 = iBarShift(_Symbol, PERIOD_H12, tempo);
+      double oh12 = iOpen(_Symbol,PERIOD_H12, indiceH12);
+      double hh12 = iHigh(_Symbol, PERIOD_H12, indiceH12);
+      double lh12 = iLow(_Symbol, PERIOD_H12, indiceH12);
+      double ch12 = iClose(_Symbol, PERIOD_H12, indiceH12);
+      
+      int indiceH1 = iBarShift(_Symbol, PERIOD_H1, tempo);
+      double oh1 = iOpen(_Symbol,PERIOD_H1, indiceH1);
+      double hh1 = iHigh(_Symbol, PERIOD_H1, indiceH1);
+      double lh1 = iLow(_Symbol, PERIOD_H1, indiceH1);
+      double ch1 = iClose(_Symbol, PERIOD_H1, indiceH1);
+      
+      int indicew1 = iBarShift(_Symbol, PERIOD_W1, tempo);
+      double ow1 = iOpen(_Symbol,PERIOD_W1, indicew1);
+      double hw1 = iHigh(_Symbol, PERIOD_W1, indicew1);
+      double lw1= iLow(_Symbol, PERIOD_W1, indicew1);
+      double cw1 = iClose(_Symbol, PERIOD_W1, indicew1);
+      
+      int indicemn1 = iBarShift(_Symbol, PERIOD_MN1, tempo);
+      double omn = iOpen(_Symbol,PERIOD_MN1, indicemn1);
+      double hmn = iHigh(_Symbol, PERIOD_MN1, indicemn1);
+      double lmn= iLow(_Symbol, PERIOD_MN1, indicemn1);
+      double cmn = iClose(_Symbol, PERIOD_MN1, indicemn1);
+      
+      int indicem30 = iBarShift(_Symbol, PERIOD_M30, tempo);
+      double om30 = iOpen(_Symbol,PERIOD_M30, indicem30);
+      double hm30 = iHigh(_Symbol, PERIOD_M30, indicem30);
+      double lm30 = iLow(_Symbol, PERIOD_M30, indicem30);
+      double cm30 = iClose(_Symbol, PERIOD_M30, indicem30);
+       
+      FileWrite(arquivo, 
+                TimeToString(tempo,TIME_DATE | TIME_MINUTES),
+                oh2, hh2, lh2, ch2,      
+                od1, hd1, cd1, ld1,
+                oh4, hh4, ch4, lh4,
+                oh6, hh6, ch6, lh6,
+                oh8, hh8, ch8, lh8,
+                oh12, hh12, ch12, lh12,
+                oh1, hh1, ch1, lh1,
+                ow1, hw1, cw1, lw1,
+                omn, hmn, cmn, lmn,
+                om30, hm30, cm30, lm30
+                ); 
+   } 
+ 
+   FileClose(arquivo); 
+ 
+   Print("Dados atualizados. Candles: ", total - 1); 
+   Print(TerminalInfoString(TERMINAL_DATA_PATH)); 
+}
